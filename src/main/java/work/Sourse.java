@@ -5,7 +5,9 @@ import lombok.Setter;
 import lombok.ToString;
 import org.apache.commons.io.FilenameUtils;
 
+import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 
 @Getter
@@ -27,6 +29,13 @@ public class Sourse {
         this.size = file.length();
         this.type = FilenameUtils.getExtension(fileName);
     }
-
+   /* public void openFile(File file) {
+        try {
+            Desktop.getDesktop().open(file);
+        } catch (
+                IOException e) {
+            e.printStackTrace();
+        }
+    }*/
 
 }
