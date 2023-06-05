@@ -1,12 +1,11 @@
 package work;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.awt.*;
+import java.io.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class Main {
     //Scanning data from a file and creating a set of trajectory points
