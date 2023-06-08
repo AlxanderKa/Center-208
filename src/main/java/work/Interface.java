@@ -17,7 +17,8 @@ public class Interface extends JFrame {
     private JPanel jPanel;
     private JButton startBut;
     private JTable table1;
-    private JScrollPane jScroll=new JScrollPane(table1);
+    private JPanel panTable;
+    private JScrollPane jScroll;
 
     private JTextField textField1;
     private Sourse openFile;

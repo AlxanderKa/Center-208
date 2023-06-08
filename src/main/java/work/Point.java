@@ -6,7 +6,7 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
+
 
 public class Point {
     private double t, B, L, H, Vx, Vy, Vz;
@@ -29,9 +29,15 @@ public class Point {
 
     public String[] toArray() {
         String[] s = new String[]{Double.toString(getT()), Double.toString(getB()), Double.toString(getL()),
-                Double.toString(getH()), Double.toString(getVx()), Double.toString(getVy()), Double.toString(getVz()),};
+                Double.toString(getH()), Double.toString(getVx()), Double.toString(getVy()), Double.toString(getVz())};
 
         return s;
     }
 
+    @Override
+    public String toString() {
+        String s = ""+Double.toString(getT())+"   "+Double.toString(getB())+"   "+Double.toString(getL())+"   "+Double.toString(getH())
+                +"   "+Double.toString(getVx())+"   "+Double.toString(getVy())+"   "+Double.toString(getVz());
+        return s;
+    }
 }
