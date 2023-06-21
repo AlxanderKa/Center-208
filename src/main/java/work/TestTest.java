@@ -14,35 +14,37 @@ import org.jfree.chart.ui.RectangleInsets;
 import org.jfree.data.xy.XYDataset;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import static work.Main.addFromFile;
 
-public class TestUI extends JFrame {
+public class TestTest extends JFrame {
+    JScrollPane graphScroll;
+    ChartPanel graph;
+    JFreeChart chart;
+
 
     private JFreeChart createChart(List<Point> points) {
-        final JFreeChart chart = ChartFactory.createXYLineChart(
-                "Графики",
-                "T, c",                        // x axis label
-                null,                        // y axis label
-                null,                        // data
-                PlotOrientation.VERTICAL,
-                true,                        // include legend
-                true,                       // tooltips
-                false                        // urls
-        );
-
-        chart.setBackgroundPaint(Color.white);
+//        final JFreeChart chart = ChartFactory.createXYLineChart(
+//                "Графики",
+//                "T, c",                        // x axis label
+//                null,                        // y axis label
+//                null,                        // data
+//                PlotOrientation.VERTICAL,
+//                true,                        // include legend
+//                true,                       // tooltips
+//                false                        // urls
+//        );
+//
+//        chart.setBackgroundPaint(Color.white);
 
         final CombinedDomainXYPlot plot = new CombinedDomainXYPlot(new NumberAxis("Графики"));
 
@@ -67,7 +69,8 @@ public class TestUI extends JFrame {
         // Настройка XYSplineRenderer
         // Precision: the number of line segments between 2 points [default: 5]
         XYSplineRenderer r0 = new XYSplineRenderer(8);
-        r0.setSeriesShapesVisible(0, true);
+        r0.setSeriesShapesVisible(5, true);
+
 
         XYSplineRenderer r1 = new XYSplineRenderer();
         r1.setPrecision(8);
@@ -82,26 +85,38 @@ public class TestUI extends JFrame {
 
         XYDataset dataset0 = Main.createDataset(-1, points);
         XYDataset dataset1 = Main.createDataset(-2, points);
-
         NumberAxis rangeAxis1 = new NumberAxis("V, м/с");
         NumberAxis rangeAxis2 = new NumberAxis("Координата, м");
         rangeAxis2.setAutoRangeIncludesZero(false);
-
         XYPlot subplot1 = new XYPlot(dataset0, null, rangeAxis1, r1);
         XYPlot subplot2 = new XYPlot(dataset1, null, rangeAxis2, r0);
 
 
         subplot1.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
+        subplot2.setRangeAxisLocation(AxisLocation.TOP_OR_LEFT);
         subplot1.setBackgroundPaint(new Color(232, 232, 232));
         subplot1.setDomainGridlinePaint(Color.gray);
         subplot1.setRangeGridlinePaint(Color.gray);
         subplot1.setAxisOffset(new RectangleInsets(1.0, 1.0, 1.0, 1.0));
-
-        subplot2.setRangeAxisLocation(AxisLocation.TOP_OR_LEFT);
         subplot2.setBackgroundPaint(new Color(232, 232, 232));
         subplot2.setDomainGridlinePaint(Color.gray);
         subplot2.setRangeGridlinePaint(Color.gray);
         subplot2.setAxisOffset(new RectangleInsets(1.0, 1.0, 1.0, 1.0));
+
+
+//        // Наборы данных
+//        XYDataset dataset0 = Main.createDataset(0, points);
+//        XYDataset dataset1 = Main.createDataset(1, points);
+//        XYDataset dataset2 = Main.createDataset(2, points);
+//
+//
+//        plot.setDataset(1, dataset1);
+//        plot.setDataset(2, dataset2);
+//
+//        // Подключение Spline Renderer к наборам данных
+//        plot.setRenderer(0, r0);
+//        plot.setRenderer(1, r1);
+//        plot.setRenderer(2, r2);
 
 
         plot.setGap(10.0);
@@ -114,17 +129,19 @@ public class TestUI extends JFrame {
         );
     }
 
-    public TestUI() {
+    private TestTest() {
         JFileChooser fileChooser = new JFileChooser();
         List<Point> point = new ArrayList<>();
         // JPanel mainPanel = new JPanel();
-        Box contents = new Box(BoxLayout.Y_AXIS);
+        Container contents = new Box(BoxLayout.Y_AXIS);
         Box textBox = new Box(BoxLayout.Y_AXIS);
         Box tableBox = new Box(BoxLayout.Y_AXIS);
         Box graphBox = new Box(BoxLayout.Y_AXIS);
         Box catalogBox = new Box(BoxLayout.Y_AXIS);
 
         JLabel mainLabel = new JLabel("Траектории");
+        //  mainLabel.setBorder(BorderFactory.createLineBorder(Color.black));
+        //mainLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         JButton fileBut = new JButton("Файл");
         JButton settingsBut = new JButton("Настройки");
         contents.add(mainLabel);
@@ -225,9 +242,9 @@ public class TestUI extends JFrame {
 
                     }
                     textBox.add(new JScrollPane(fileText));
-//                    vx.setSelected(true);
-//                    vy.setSelected(true);
-//                    vz.setSelected(true);
+                    vx.setSelected(true);
+                    vy.setSelected(true);
+                    vz.setSelected(true);
                     JFreeChart chart = createChart(points);
                     ChartPanel graph = new ChartPanel(chart);
 
@@ -244,20 +261,83 @@ public class TestUI extends JFrame {
                 }
             }
         });
-//       vx.addItemListener(new ItemListener() {
-//           @Override
-//           public void itemStateChanged(ItemEvent e) {
-//               if(e.getStateChange()==ItemEvent.SELECTED){
+//        vx.addItemListener(new ItemListener() {
+//            @Override
+//            public void itemStateChanged(ItemEvent e) {
+//                if (e.getStateChange() == ItemEvent.SELECTED) {
+//                    xm.setSelected(false);
+//                    ym.setSelected(false);
+//                    zm.setSelected(false);
+////                    chart = createChart(point, 1);
+////                    graph = new ChartPanel(chart);
+////                    graph.setPreferredSize(new java.awt.Dimension(560, 480));
+////                    graphScroll = new JScrollPane(graph);
+////                    graphBox.add(graphScroll);
+//                } else {
+////                    chart = createChart(null, 1);
+////                    chart.fireChartChanged();
+////                    ChartPanel graph1 = new ChartPanel(chart);
+////                    graphScroll = new JScrollPane(graph1);
+////                    graphBox.add(graphScroll);
+////
+//                }
 //
-//               }else {
 //
-//               }
-//           }
-//       });
+//            }
+//        });
+//        vy.addItemListener(new ItemListener() {
+//            @Override
+//            public void itemStateChanged(ItemEvent e) {
+//                if (e.getStateChange() == ItemEvent.SELECTED) {
+//                    xm.setSelected(false);
+//                    ym.setSelected(false);
+//                    zm.setSelected(false);
+////                    chart = createChart(point, 1);
+////                    graph = new ChartPanel(chart);
+////                    graph.setPreferredSize(new java.awt.Dimension(560, 480));
+////                    graphScroll = new JScrollPane(graph);
+////                    graphBox.add(graphScroll);
+//                } else {
+////                    chart = createChart(null, 1);
+////                    chart.fireChartChanged();
+////                    ChartPanel graph1 = new ChartPanel(chart);
+////                    graphScroll = new JScrollPane(graph1);
+////                    graphBox.add(graphScroll);
+////
+//                }
+//
+//
+//            }
+//        });
+//        vz.addItemListener(new ItemListener() {
+//            @Override
+//            public void itemStateChanged(ItemEvent e) {
+//                if (e.getStateChange() == ItemEvent.SELECTED) {
+//                    xm.setSelected(false);
+//                    ym.setSelected(false);
+//                    zm.setSelected(false);
+////                    chart = createChart(point, 1);
+////                    graph = new ChartPanel(chart);
+////                    graph.setPreferredSize(new java.awt.Dimension(560, 480));
+////                    graphScroll = new JScrollPane(graph);
+////                    graphBox.add(graphScroll);
+//                } else {
+////                    chart = createChart(null, 1);
+////                    chart.fireChartChanged();
+////                    ChartPanel graph1 = new ChartPanel(chart);
+////                    graphScroll = new JScrollPane(graph1);
+////                    graphBox.add(graphScroll);
+////
+//                }
+//
+//
+//            }
+//        });
+
 
     }
 
     public static void main(String[] args) {
-        TestUI ui = new TestUI();
+        TestTest test = new TestTest();
     }
 }
