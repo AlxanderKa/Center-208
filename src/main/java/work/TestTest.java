@@ -133,20 +133,58 @@ public class TestTest extends JFrame {
         JFileChooser fileChooser = new JFileChooser();
         List<Point> point = new ArrayList<>();
         // JPanel mainPanel = new JPanel();
+        JFrame frame = new JFrame();
         Container contents = new Box(BoxLayout.Y_AXIS);
         Box textBox = new Box(BoxLayout.Y_AXIS);
         Box tableBox = new Box(BoxLayout.Y_AXIS);
         Box graphBox = new Box(BoxLayout.Y_AXIS);
         Box catalogBox = new Box(BoxLayout.Y_AXIS);
+        Box menuBox = new Box(BoxLayout.Y_AXIS);
 
-        JLabel mainLabel = new JLabel("Траектории");
-        //  mainLabel.setBorder(BorderFactory.createLineBorder(Color.black));
-        //mainLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        JButton fileBut = new JButton("Файл");
-        JButton settingsBut = new JButton("Настройки");
-        contents.add(mainLabel);
-        contents.add(fileBut);
-        contents.add(settingsBut);
+        JMenuBar menuBar = new JMenuBar();
+        JMenu file = new JMenu("Файл");
+        JMenuItem open = new JMenuItem("Открыть");
+        JMenuItem openLast = new JMenuItem("Открыть недавние");
+        JMenuItem close = new JMenuItem("Закрыть");
+        JMenuItem closeAll = new JMenuItem("Закрыть все");
+        file.add(open);
+        file.addSeparator();
+        file.add(openLast);
+        file.addSeparator();
+        file.add(close);
+        file.addSeparator();
+        file.add(closeAll);
+
+        JMenu viewMenu = new JMenu("Настройки");
+        JMenuItem settings = new JMenuItem("Сохранить положение окон");
+        viewMenu.add(settings);
+
+        close.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+
+        menuBar.add(file);
+        menuBar.add(viewMenu);
+//        menuBox.add(menuBar);
+//        setJMenuBar(menuBar);
+//        contents.add(menuBox);
+
+//        menuBox.add(menuBar);
+//            contents.add(menuBox);
+
+
+//        JLabel mainLabel = new JLabel("Траектории");
+//        //  mainLabel.setBorder(BorderFactory.createLineBorder(Color.black));
+//         //mainLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+//        JButton fileBut = new JButton("Файл");
+//        JButton settingsBut = new JButton("Настройки");
+//        contents.add(mainLabel);
+//        contents.add(fileBut);
+//        contents.add(settingsBut);
+
 
         final JSplitPane verticalSplit = new JSplitPane();
         verticalSplit.setDividerSize(8);
@@ -208,7 +246,7 @@ public class TestTest extends JFrame {
         box.add(sliderLabel);
         box.add(slider);
         graphBox.add(box);
-        //  graphBox.add(graphScroll);
+
 
         lHorizontal.setTopComponent(catalogBox);
         lHorizontal.setBottomComponent(textBox);
@@ -216,13 +254,19 @@ public class TestTest extends JFrame {
         rHorizontal.setBottomComponent(graphBox);
         verticalSplit.setLeftComponent(lHorizontal);
         verticalSplit.setRightComponent(rHorizontal);
+        //frame.add(verticalSplit);
+        menuBar.setVisible(true);
+        setJMenuBar(menuBar);
         contents.add(verticalSplit);
+        //frame.setJMenuBar(menuBar);
+        //frame.pack();
+        //contents.add(frame);
         setContentPane(contents);
         setSize(1000, 1000);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
 
-        fileBut.addActionListener(new ActionListener() {
+        open.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int returnValue = fileChooser.showOpenDialog(null);
@@ -248,7 +292,7 @@ public class TestTest extends JFrame {
                     JFreeChart chart = createChart(points);
                     ChartPanel graph = new ChartPanel(chart);
 
-                    graph.setPreferredSize(new java.awt.Dimension(560, 480));
+                    graph.setPreferredSize(new Dimension(560, 480));
                     graphBox.add(new JScrollPane(graph));
                     //graphScroll.add(graph);
 
@@ -295,7 +339,7 @@ public class TestTest extends JFrame {
 ////                    chart = createChart(point, 1);
 ////                    graph = new ChartPanel(chart);
 ////                    graph.setPreferredSize(new java.awt.Dimension(560, 480));
-////                    graphScroll = new JScrollPane(graph);
+////                    graphScroll = new JScrollPane(graph);v
 ////                    graphBox.add(graphScroll);
 //                } else {
 ////                    chart = createChart(null, 1);
@@ -338,6 +382,7 @@ public class TestTest extends JFrame {
     }
 
     public static void main(String[] args) {
+        setDefaultLookAndFeelDecorated(true);
         TestTest test = new TestTest();
     }
 }
