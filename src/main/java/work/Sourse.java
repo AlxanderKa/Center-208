@@ -9,6 +9,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Getter
 @Setter
@@ -23,7 +24,7 @@ public class Sourse {
 
     public Sourse(String pathStr) {
         this.pathStr = pathStr;
-        this.path = Path.of(pathStr);
+        this.path = Paths.get(pathStr);
         this.file = new File(pathStr);
         this.fileName = file.getName();
         this.size = file.length();

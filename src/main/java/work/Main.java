@@ -27,7 +27,7 @@ public class Main {
                     if (line == null) {
                         break;
                     }
-                    line = line.strip().replace(",", ".");
+                    line = line.trim().replace(",", ".");
                     String[] dotdata = line.split("\\s+");
                     Point dot = new Point(Double.parseDouble(dotdata[0]), Double.parseDouble(dotdata[1]),
                             Double.parseDouble(dotdata[2]), Double.parseDouble(dotdata[3]),
