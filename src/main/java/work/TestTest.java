@@ -94,14 +94,14 @@ public class TestTest extends JFrame {
 //        Box graphBox = new Box(BoxLayout.Y_AXIS);
 //        Box catalogBox = new Box(BoxLayout.Y_AXIS);
 //        Box menuBox = new Box(BoxLayout.Y_AXIS);
-         tabs = new JTabbedPane(
+        tabs = new JTabbedPane(
                 JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
-         a=1;
+        a = 1;
 
 
         JMenuBar menuBar = new JMenuBar();
         JMenu file = new JMenu("Файл");
-         open = new JMenuItem("Открыть");
+        open = new JMenuItem("Открыть");
         JMenuItem openLast = new JMenuItem("Открыть недавние");
         JMenuItem close = new JMenuItem("Закрыть");
         JMenuItem closeAll = new JMenuItem("Закрыть все");
@@ -120,7 +120,13 @@ public class TestTest extends JFrame {
         close.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.exit(0);
+                tabs.remove(tabs.getSelectedComponent());
+            }
+        });
+        closeAll.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tabs.removeAll();
             }
         });
 
@@ -195,6 +201,7 @@ public class TestTest extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
     }
+
     private void addInputListeners() {
         open.addActionListener(new ActionListener() {
             @Override
@@ -266,7 +273,7 @@ public class TestTest extends JFrame {
                     filename = JOptionPane.showInputDialog(
                             TestTest.this,
                             "<html><h2>Введите имя файла");
-                    if(filename.isEmpty()){
+                    if (filename.isEmpty()) {
                         filename = String.format("Траектория %d", a);
                         a++;
                     }
