@@ -17,6 +17,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static work.FileParser.*;
 
@@ -27,8 +28,8 @@ public class TestTest extends JFrame {
     JTabbedPane tabs;
     JMenuItem open;
     int a;
-   LinkedHashMap<String, String> recentFiles = new LinkedHashMap<>();
-
+    LinkedHashMap<String, String> recentFiles = new LinkedHashMap<>();
+    ArrayList<String> recentLinks = new ArrayList<>();
 
     public static JFreeChart createChart(List<Point> points) {
 
@@ -82,6 +83,23 @@ public class TestTest extends JFrame {
         );
     }
 
+    public static void putLink(List<String> arr, String link) {
+        if (arr.isEmpty()) {
+            arr.add(link);
+        } else {
+            if (arr.contains(link)) {
+                int n = arr.indexOf(link);
+                arr.remove(n);
+                arr.add(0, link);
+
+
+            } else {
+                arr.add(0, link);
+            }
+        }
+
+    }
+
     public JSplitPane createTab() {
         JFileChooser fileChooser = new JFileChooser();
         Component[] components = new Component[3];
@@ -106,7 +124,8 @@ public class TestTest extends JFrame {
                 filename = String.format("Траектория %d", a);
                 a++;
             }
-            recentFiles.put(file1.getPath(), file1.getName());
+
+            putLink(recentLinks, file1.getPath());
             components = createComponent(file1.getPath());
 //                    filePathLabel.setText(file1.getPath());
 //                    List<Point> points = addFromFile(file1.getPath());
@@ -155,7 +174,7 @@ public class TestTest extends JFrame {
 //        Box graphBox = new Box(BoxLayout.Y_AXIS);
 //        Box catalogBox = new Box(BoxLayout.Y_AXIS);
 //        Box menuBox = new Box(BoxLayout.Y_AXIS);
-       ImageIcon icon = new ImageIcon();
+        ImageIcon icon = new ImageIcon();
         tabs = new JTabbedPane(
                 JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
         a = 1;
@@ -183,25 +202,26 @@ public class TestTest extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 tabs.remove(tabs.getSelectedComponent());
+
+
             }
         });
         closeAll.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 tabs.removeAll();
+                a = 1;
             }
         });
         openLast.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String[] names = recentFiles.values().toArray(new String[recentFiles.size()]);
-                String[] pathes = recentFiles.keySet().toArray(new String[recentFiles.size()]) ;
-                Collections.reverse(Arrays.asList(pathes));
+               String[] items = recentLinks.stream().toArray(String[]::new);
                 Object result = JOptionPane.showInputDialog(
                         TestTest.this,
                         "Выберете недавний файл",
                         "Выбор файла",
-                        JOptionPane.QUESTION_MESSAGE, icon, pathes, pathes[0]);
+                        JOptionPane.QUESTION_MESSAGE, icon, items, items[0]);
                 Component[] components = new Component[3];
 
                 final JSplitPane verticalSplit = new JSplitPane();
@@ -212,7 +232,7 @@ public class TestTest extends JFrame {
                 rHorizontal.setDividerLocation(100);
                 lHorizontal.setDividerLocation(100);
 
-                components=createComponent(result.toString());
+                components = createComponent(result.toString());
                 verticalSplit.setLeftComponent(components[0]);
                 rHorizontal.setTopComponent(components[1]);
                 rHorizontal.setBottomComponent(components[2]);
@@ -227,7 +247,7 @@ public class TestTest extends JFrame {
                 tabs.add(filename, verticalSplit);
 
                 // Диалоговое окно вывода сообщения
-               // JOptionPane.showMessageDialog(JOptionPaneTest.this, result);
+                // JOptionPane.showMessageDialog(JOptionPaneTest.this, result);
             }
         });
 
