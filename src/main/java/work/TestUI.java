@@ -26,7 +26,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static work.Main.addFromFile;
+import static work.FileParser.addFromFile;
+import static work.FileParser.createDataset;
+
 
 public class TestUI extends JFrame {
     String filename;
@@ -55,8 +57,8 @@ public class TestUI extends JFrame {
         r2.setSeriesStroke(0, new BasicStroke(2.5f));
 
 
-        XYDataset dataset0 = Main.createDataset(-1, points);
-        XYDataset dataset1 = Main.createDataset(-2, points);
+        XYDataset dataset0 = createDataset(-1, points);
+        XYDataset dataset1 = createDataset(-2, points);
         NumberAxis rangeAxis1 = new NumberAxis("V, м/с");
         NumberAxis rangeAxis2 = new NumberAxis("Координата, м");
         rangeAxis2.setAutoRangeIncludesZero(false);
