@@ -17,7 +17,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static work.FileParser.*;
 
@@ -27,8 +26,9 @@ public class TestTest extends JFrame {
     String filename;
     JTabbedPane tabs;
     JMenuItem open;
-    int a;
-    LinkedHashMap<String, String> recentFiles = new LinkedHashMap<>();
+    int tabbedCount;
+    HashMap<String, String> openFiles = new HashMap<>();
+    HashMap<String, Integer> countOpenFile = new HashMap<>();
     ArrayList<String> recentLinks = new ArrayList<>();
 
     public static JFreeChart createChart(List<Point> points) {
@@ -102,7 +102,7 @@ public class TestTest extends JFrame {
 
     public JSplitPane createTab() {
         JFileChooser fileChooser = new JFileChooser();
-        Component[] components = new Component[3];
+        Component[] components;
 
         final JSplitPane verticalSplit = new JSplitPane();
         verticalSplit.setDividerSize(8);
@@ -113,71 +113,72 @@ public class TestTest extends JFrame {
         lHorizontal.setDividerLocation(100);
 
         int returnValue = fileChooser.showOpenDialog(null);
-        // int returnValue = jfc.showSaveDialog(null);
-
         if (returnValue == JFileChooser.APPROVE_OPTION) {
-            File file1 = fileChooser.getSelectedFile();
-            filename = JOptionPane.showInputDialog(
-                    TestTest.this,
-                    "<html><h2>Введите имя файла");
-            if (filename.isEmpty()) {
-                filename = String.format("Траектория %d", a);
-                a++;
+            if (countOpenFile.containsKey(fileChooser.getSelectedFile().getPath())) {
+                int res = JOptionPane.showConfirmDialog(TestTest.this,
+                        "Файл уже открыт, хотите открыть еще раз?",
+                        "Файл уже открыт",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE);
+                if (res == JOptionPane.YES_OPTION) {
+                    File file1 = fileChooser.getSelectedFile();
+                    filename = JOptionPane.showInputDialog(
+                            TestTest.this,
+                            "<html><h2>Введите имя файла");
+                    if (filename.isEmpty()) {
+                        filename = String.format("Траектория %d", tabbedCount);
+                        tabbedCount++;
+                    }
+                    countOpenFile.put(file1.getPath(), countOpenFile.get(file1.getPath()) + 1);
+                    putLink(recentLinks, file1.getPath());
+                    components = createComponent(file1.getPath());
+
+
+                    verticalSplit.setLeftComponent(components[0]);
+                    rHorizontal.setTopComponent(components[1]);
+                    rHorizontal.setBottomComponent(components[2]);
+                    verticalSplit.setRightComponent(rHorizontal);
+                    tabs.add(filename, verticalSplit);
+
+                    return verticalSplit;
+
+                }
+                if (res == JOptionPane.NO_OPTION) {
+                    createTab();
+                }
+            } else {
+                File file1 = fileChooser.getSelectedFile();
+                filename = JOptionPane.showInputDialog(
+                        TestTest.this,
+                        "<html><h2>Введите имя файла");
+                if (filename.isEmpty()) {
+                    filename = String.format("Траектория %d", tabbedCount);
+                    tabbedCount++;
+                }
+                openFiles.put(file1.getPath(), filename);
+                countOpenFile.put(file1.getPath(), 1);
+
+
+                putLink(recentLinks, file1.getPath());
+                components = createComponent(file1.getPath());
+                verticalSplit.setLeftComponent(components[0]);
+                rHorizontal.setTopComponent(components[1]);
+                rHorizontal.setBottomComponent(components[2]);
+                verticalSplit.setRightComponent(rHorizontal);
+                tabs.add(filename, verticalSplit);
+                return verticalSplit;
+
+
             }
-
-            putLink(recentLinks, file1.getPath());
-            components = createComponent(file1.getPath());
-//                    filePathLabel.setText(file1.getPath());
-//                    List<Point> points = addFromFile(file1.getPath());
-//                    String[][] outPoints = new String[points.size()][];
-//                    for (int i = 0; i < points.size(); i++) {
-//                        fileText.append(points.get(i).toString() + "\n");//add string to area
-//
-//                        //  text.setLineWrap(true);
-//                        outPoints[i] = points.get(i).toArray();//add data on table
-//
-//                    }
-//                    textBox.add(new JScrollPane(fileText));
-//                    vx.setSelected(true);
-//                    vy.setSelected(true);
-//                    vz.setSelected(true);
-//                    JFreeChart chart = createChart(points);
-//                    ChartPanel graph = new ChartPanel(chart);
-//
-//                    graph.setPreferredSize(new Dimension(560, 480));
-//                    graphBox.add(new JScrollPane(graph));
-//                    //graphScroll.add(graph);
-//
-//                    JTable table1 = new JTable(outPoints, points.get(0).getName());//create data table
-//                    tableBox.add(new JScrollPane(table1));
-//                    //table = table1;
-//                    // tableScroll.add(table1);
-
-
         }
-
-        verticalSplit.setLeftComponent(components[0]);
-        rHorizontal.setTopComponent(components[1]);
-        rHorizontal.setBottomComponent(components[2]);
-        verticalSplit.setRightComponent(rHorizontal);
-        tabs.add(filename, verticalSplit);
-
-        return verticalSplit;
+        return null;
     }
 
     private TestTest() {
-//        JFileChooser fileChooser = new JFileChooser();
-//        List<Point> point = new ArrayList<>();
-//        Container contents = new Box(BoxLayout.Y_AXIS);
-//        Box textBox = new Box(BoxLayout.Y_AXIS);
-//        Box tableBox = new Box(BoxLayout.Y_AXIS);
-//        Box graphBox = new Box(BoxLayout.Y_AXIS);
-//        Box catalogBox = new Box(BoxLayout.Y_AXIS);
-//        Box menuBox = new Box(BoxLayout.Y_AXIS);
         ImageIcon icon = new ImageIcon();
         tabs = new JTabbedPane(
                 JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
-        a = 1;
+        tabbedCount = 1;
 
 
         JMenuBar menuBar = new JMenuBar();
@@ -201,6 +202,20 @@ public class TestTest extends JFrame {
         close.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                String name= tabs.getTitleAt(tabs.getSelectedIndex());
+                 String[] path = new String[1];
+                    openFiles.forEach((k,v)->{
+                        if(v.equals(name)){
+                            path[0] =k;
+                        }
+                    });
+                    if(countOpenFile.get(path[0])>1){
+                        countOpenFile.put(path[0], countOpenFile.get(path[0])-1);
+                    }else {
+                        openFiles.remove(path[0]);
+                        countOpenFile.remove(path[0]);
+                    }
+
                 tabs.remove(tabs.getSelectedComponent());
 
 
@@ -209,114 +224,64 @@ public class TestTest extends JFrame {
         closeAll.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                openFiles.clear();
+                countOpenFile.clear();
                 tabs.removeAll();
-                a = 1;
+                tabbedCount = 1;
             }
         });
         openLast.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-               String[] items = recentLinks.stream().toArray(String[]::new);
+                String[] items = recentLinks.stream().toArray(String[]::new);
                 Object result = JOptionPane.showInputDialog(
                         TestTest.this,
                         "Выберете недавний файл",
                         "Выбор файла",
                         JOptionPane.QUESTION_MESSAGE, icon, items, items[0]);
                 Component[] components = new Component[3];
+                if(countOpenFile.containsKey(result.toString())){
+                    int res = JOptionPane.showConfirmDialog(TestTest.this,
+                            "Файл уже открыт, хотите открыть его еще раз?",
+                            "Файл уже открыт",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.WARNING_MESSAGE);
+                    if(res==JOptionPane.YES_OPTION){
+                        final JSplitPane verticalSplit = new JSplitPane();
+                        verticalSplit.setDividerSize(8);
+                        verticalSplit.setDividerLocation(150);
+                        JSplitPane rHorizontal = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
+                        JSplitPane lHorizontal = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
+                        rHorizontal.setDividerLocation(100);
+                        lHorizontal.setDividerLocation(100);
 
-                final JSplitPane verticalSplit = new JSplitPane();
-                verticalSplit.setDividerSize(8);
-                verticalSplit.setDividerLocation(150);
-                JSplitPane rHorizontal = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
-                JSplitPane lHorizontal = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
-                rHorizontal.setDividerLocation(100);
-                lHorizontal.setDividerLocation(100);
-
-                components = createComponent(result.toString());
-                verticalSplit.setLeftComponent(components[0]);
-                rHorizontal.setTopComponent(components[1]);
-                rHorizontal.setBottomComponent(components[2]);
-                verticalSplit.setRightComponent(rHorizontal);
-                filename = JOptionPane.showInputDialog(
-                        TestTest.this,
-                        "<html><h2>Введите имя файла");
-                if (filename.isEmpty()) {
-                    filename = String.format("Траектория %d", a);
-                    a++;
+                        components = createComponent(result.toString());
+                        verticalSplit.setLeftComponent(components[0]);
+                        rHorizontal.setTopComponent(components[1]);
+                        rHorizontal.setBottomComponent(components[2]);
+                        verticalSplit.setRightComponent(rHorizontal);
+                        filename = JOptionPane.showInputDialog(
+                                TestTest.this,
+                                "<html><h2>Введите имя файла");
+                        if (filename.isEmpty()) {
+                            filename = String.format("Траектория %d", tabbedCount);
+                            tabbedCount++;
+                        }
+                        tabs.add(filename, verticalSplit);
+                    }
                 }
-                tabs.add(filename, verticalSplit);
 
-                // Диалоговое окно вывода сообщения
-                // JOptionPane.showMessageDialog(JOptionPaneTest.this, result);
+
+
+
             }
         });
 
         menuBar.add(file);
         menuBar.add(viewMenu);
 
-
-//        final JSplitPane verticalSplit = new JSplitPane();
-//        verticalSplit.setDividerSize(8);
-//        verticalSplit.setDividerLocation(150);
-//        JSplitPane rHorizontal = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
-//        JSplitPane lHorizontal = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
-//        rHorizontal.setDividerLocation(100);
-//        lHorizontal.setDividerLocation(100);
-//
-//        JLabel catalogLabel = new JLabel("Каталог");
-//        catalogBox.add(catalogLabel);
-//
-//        JLabel fileLabel = new JLabel("Файл");
-//        JLabel filePathLabel = new JLabel();
-//        JTextArea fileText = new JTextArea();
-//        textBox.add(fileLabel);
-//        textBox.add(new JScrollPane(filePathLabel));
-//
-//
-//        JLabel tableLabel = new JLabel("Таблица");
-//        tableBox.add(tableLabel);
-//
-//
-//        JLabel graphLabel = new JLabel("Графики");
-//        JLabel coordinateLabel = new JLabel("Координаты");
-//        JCheckBox xm = new JCheckBox("X, м");
-//        JCheckBox ym = new JCheckBox("Z, м");
-//        JCheckBox zm = new JCheckBox("Y, м");
-//        JLabel speedLabel = new JLabel("Проекции скорости");
-//        JCheckBox vx = new JCheckBox("Vx, м/с");
-//        JCheckBox vy = new JCheckBox("Vy, м/с");
-//        JCheckBox vz = new JCheckBox("Vz, м/с");
-//        JLabel sliderLabel = new JLabel("Сглаживание");
-//        JSlider slider = new JSlider();
-//        graphBox.add(graphLabel);
-//
-//        Box box = new Box(BoxLayout.X_AXIS);
-//        box.add(coordinateLabel);
-//        box.add(xm);
-//        box.add(ym);
-//        box.add(zm);
-//        box.add(speedLabel);
-//
-//        box.add(speedLabel);
-//        box.add(vx);
-//        box.add(vy);
-//        box.add(vz);
-//        box.add(sliderLabel);
-//        box.add(slider);
-//        graphBox.add(box);
-//
-//
-//        lHorizontal.setTopComponent(catalogBox);
-//        lHorizontal.setBottomComponent(textBox);
-//        rHorizontal.setTopComponent(tableBox);
-//        rHorizontal.setBottomComponent(graphBox);
-//        verticalSplit.setLeftComponent(lHorizontal);
-//        verticalSplit.setRightComponent(rHorizontal);
-//        menuBar.setVisible(true);
         setJMenuBar(menuBar);
-//        contents.add(verticalSplit);
         addInputListeners();
-//        setContentPane(contents);
         getContentPane().add(tabs);
         setSize(1000, 1000);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -327,114 +292,11 @@ public class TestTest extends JFrame {
         open.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-//                JFileChooser fileChooser = new JFileChooser();
-//                Component[] components = new Component[3];
-//
-//
-////                Box textBox = new Box(BoxLayout.Y_AXIS);
-////                Box tableBox = new Box(BoxLayout.Y_AXIS);
-////                Box graphBox = new Box(BoxLayout.Y_AXIS);
-//                final JSplitPane verticalSplit = new JSplitPane();
-//                verticalSplit.setDividerSize(8);
-//                verticalSplit.setDividerLocation(150);
-//                JSplitPane rHorizontal = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
-//                JSplitPane lHorizontal = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
-//                rHorizontal.setDividerLocation(100);
-//                lHorizontal.setDividerLocation(100);
-//
-//
-////                JLabel fileLabel = new JLabel("Файл");
-////                JLabel filePathLabel = new JLabel();
-////                // JScrollPane fileScroll = new JScrollPane();
-////                JTextArea fileText = new JTextArea();
-////                textBox.add(fileLabel);
-////                textBox.add(new JScrollPane(filePathLabel));
-//
-//
-////                JLabel tableLabel = new JLabel("Таблица");
-////
-////                tableBox.add(tableLabel);
-//
-//
-////                JLabel graphLabel = new JLabel("Графики");
-////                JLabel coordinateLabel = new JLabel("Координаты");
-////
-////                JCheckBox xm = new JCheckBox("X, м");
-////                JCheckBox ym = new JCheckBox("Z, м");
-////                JCheckBox zm = new JCheckBox("Y, м");
-////                JLabel speedLabel = new JLabel("Проекции скорости");
-////
-////                JCheckBox vx = new JCheckBox("Vx, м/с");
-////                JCheckBox vy = new JCheckBox("Vy, м/с");
-////                JCheckBox vz = new JCheckBox("Vz, м/с");
-////                JLabel sliderLabel = new JLabel("Сглаживание");
-////                JSlider slider = new JSlider();
-////
-////                graphBox.add(graphLabel);
-////
-////                Box box = new Box(BoxLayout.X_AXIS);
-////                box.add(coordinateLabel);
-////                box.add(xm);
-////                box.add(ym);
-////                box.add(zm);
-////                box.add(speedLabel);
-////                ;
-////                box.add(speedLabel);
-////                box.add(vx);
-////                box.add(vy);
-////                box.add(vz);
-////                box.add(sliderLabel);
-////                box.add(slider);
-////                graphBox.add(box);
-//                int returnValue = fileChooser.showOpenDialog(null);
-//                // int returnValue = jfc.showSaveDialog(null);
-//
-//                if (returnValue == JFileChooser.APPROVE_OPTION) {
-//                    File file1 = fileChooser.getSelectedFile();
-//                    filename = JOptionPane.showInputDialog(
-//                            TestTest.this,
-//                            "<html><h2>Введите имя файла");
-//                    if (filename.isEmpty()) {
-//                        filename = String.format("Траектория %d", a);
-//                        a++;
-//                    }
-//                    components = CreateComponent(file1.getPath());
-////                    filePathLabel.setText(file1.getPath());
-////                    List<Point> points = addFromFile(file1.getPath());
-////                    String[][] outPoints = new String[points.size()][];
-////                    for (int i = 0; i < points.size(); i++) {
-////                        fileText.append(points.get(i).toString() + "\n");//add string to area
-////
-////                        //  text.setLineWrap(true);
-////                        outPoints[i] = points.get(i).toArray();//add data on table
-////
-////                    }
-////                    textBox.add(new JScrollPane(fileText));
-////                    vx.setSelected(true);
-////                    vy.setSelected(true);
-////                    vz.setSelected(true);
-////                    JFreeChart chart = createChart(points);
-////                    ChartPanel graph = new ChartPanel(chart);
-////
-////                    graph.setPreferredSize(new Dimension(560, 480));
-////                    graphBox.add(new JScrollPane(graph));
-////                    //graphScroll.add(graph);
-////
-////                    JTable table1 = new JTable(outPoints, points.get(0).getName());//create data table
-////                    tableBox.add(new JScrollPane(table1));
-////                    //table = table1;
-////                    // tableScroll.add(table1);
-//
-//
-//                }
-//
-//                verticalSplit.setLeftComponent(components[0]);
-//                rHorizontal.setTopComponent(components[1]);
-//                rHorizontal.setBottomComponent(components[2]);
-//                verticalSplit.setRightComponent(rHorizontal);
-                JSplitPane verticalSplit = createTab();
-                tabs.add(filename, verticalSplit);
 
+                JSplitPane verticalSplit = createTab();
+                if (verticalSplit != null) {
+                    tabs.add(filename, verticalSplit);
+                }
 
             }
         });
